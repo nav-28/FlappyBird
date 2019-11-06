@@ -2,7 +2,7 @@ import pygame
 
 
 def main():
-    window_size = (1000, 1500)
+    window_size = (1080, 1920)
 
     pygame.display.set_mode(window_size)
     pygame.display.set_caption("Flappy Bird")
@@ -24,14 +24,21 @@ class Game:
         self.continue_game = True
         self.key_pressed = False
 
+        # fps counter
         self.fps = 30
         self.max_fps = 60
 
+        # bird variables
         self.color = pygame.Color('white')
-        self.bird = pygame.Rect(surface.get_width()//2, surface.get_height() - 50, 50, 50)
+        self.bird = pygame.Rect(surface.get_width() // 2, surface.get_height() // 2, 50, 50)
+        self.bird_x_velocity = 5
         self.isJump = False
         self.max_jump = 10
-        self.jump_count = self.max_jump
+        self.jump_count = 0
+
+        # background
+        self.background = pygame.image.load("./Assets/flappy_background.png").convert()
+        self.bg_scorll = 0
 
     def play(self):
         while self.continue_game:
@@ -40,6 +47,7 @@ class Game:
             self.draw()
             self.update()
 
+            self.check_border()
             self.clock.tick(self.fps)
 
     def event_handler(self):
@@ -57,22 +65,36 @@ class Game:
 
     def draw(self):
         self.surface.fill(self.bg_color)
+        self.background_scroll()
         pygame.draw.rect(self.surface, self.color, self.bird)
 
     def update(self):
-        if self.isJump:
-            self.jump()
+        self.jump()
         pygame.display.update()
 
+    def background_scroll(self):
+        rel_x = self.bg_scorll % self.background.get_rect().width
+        self.surface.blit(self.background, (rel_x - self.background.get_rect().width, 0))
+        if rel_x < self.surface.get_width():
+            self.surface.blit(self.background, (rel_x, 0))
+        self.bg_scorll -= 1
+
+    def check_border(self):
+        if self.bird.y > self.surface.get_height() + 100:
+            self.continue_game = False
+
     def jump(self):
-        if self.jump_count >= -10:
-            neg = 1
-            if self.jump_count < 0:
-                neg = -neg
-            self.bird.y -= self.jump_count ** 2 * neg
-            self.jump_count -= 1
-        else:
+        if self.isJump:
             self.jump_count = self.max_jump
             self.isJump = False
+        neg = 1
+        if self.jump_count < 0:
+            neg = -neg
+        self.bird.y -= self.jump_count ** 2 * neg * 0.5
+        if self.jump_count > 0:
+            self.jump_count -= 1
+        else:
+            self.jump_count -= 0.5
+
 
 main()
