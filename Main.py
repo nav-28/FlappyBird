@@ -39,6 +39,7 @@ class Game:
         # background
         self.background = pygame.image.load("./Assets/flappy_background.png").convert()
         self.bg_scorll = 0
+        self.bottom = pygame.image.load("./Assets/Bottom_border.png").convert()
 
     def play(self):
         while self.continue_game:
@@ -64,20 +65,22 @@ class Game:
                 self.key_pressed = False
 
     def draw(self):
-        self.surface.fill(self.bg_color)
-        self.background_scroll()
+        self.surface.blit(self.background, (0, 0))
         pygame.draw.rect(self.surface, self.color, self.bird)
+        self.background_scroll()
+
 
     def update(self):
         self.jump()
         pygame.display.update()
 
     def background_scroll(self):
-        rel_x = self.bg_scorll % self.background.get_rect().width
-        self.surface.blit(self.background, (rel_x - self.background.get_rect().width, 0))
+
+        rel_x = self.bg_scorll % self.bottom.get_rect().width
+        self.surface.blit(self.bottom, (rel_x - self.bottom.get_rect().width, self.surface.get_height() - self.bottom.get_rect().height))
         if rel_x < self.surface.get_width():
-            self.surface.blit(self.background, (rel_x, 0))
-        self.bg_scorll -= 1
+            self.surface.blit(self.bottom, (rel_x, self.surface.get_height() - self.bottom.get_rect().height))
+        self.bg_scorll -= 5
 
     def check_border(self):
         if self.bird.y > self.surface.get_height() + 100:
