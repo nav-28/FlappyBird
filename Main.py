@@ -1,6 +1,7 @@
 # Flappy Bird
 
 import pygame
+import math
 
 
 def main():
@@ -36,16 +37,13 @@ class Game:
         self.bg_scorll = 0
         self.bottom = pygame.image.load("./Assets/Bottom_border.png").convert()
 
-        # bird variables
-        self.color = pygame.Color('black')
-        self.bird = pygame.Rect(surface.get_width() // 2, surface.get_height() // 2 - self.bottom.get_rect().height, 50,
-                                50)
-        self.bird_x_velocity = 5
+        # flappy variables
+        self.flappy = Bird(surface, self.bottom)
+        self.max_jump = 10
+        self.jump_count = 0
 
         # Jumping variables
         self.isJump = False
-        self.max_jump = 10
-        self.jump_count = 0
 
         # bottom rect for collision
         self.bottom_rect = pygame.Rect(0, self.surface.get_height() - self.bottom.get_rect().height,
@@ -55,7 +53,10 @@ class Game:
         # main game loop
         while self.continue_game:
             self.event_handler()
-            self.jump()
+            if self.start_game:
+                self.jump()
+            else:
+                self.flappy.dance()
             self.draw()
             self.check_bottom_collision()
             pygame.display.update()
@@ -76,15 +77,10 @@ class Game:
             if event.type == pygame.KEYUP:
                 self.key_pressed = False
 
-    def jump(self):
-        # starts the game when space is pressed
-        if self.start_game:
-            self.jump()
-
     def draw(self):
         # draws the objects on the surface
         self.surface.blit(self.background, (0, -self.bottom.get_rect().height))
-        pygame.draw.rect(self.surface, self.color, self.bird)
+        self.flappy.draw()
         if self.continue_game:
             self.background_scroll()
 
@@ -99,10 +95,8 @@ class Game:
 
     def check_bottom_collision(self):
         # checking for end game collision
-        if self.bottom_rect.collidepoint(self.bird.x, self.bird.y + self.bird.height):
+        if self.bottom_rect.collidepoint(self.flappy.x, self.flappy.y + self.flappy.height()):
             self.continue_game = False
-            pygame.draw.line(self.surface, pygame.Color('red'), (0, self.bird.y + self.bird.height),
-                             (self.surface.get_width(), self.bird.y + self.bird.height))
             pygame.display.update()
 
     def jump(self):
@@ -113,11 +107,49 @@ class Game:
         neg = 1
         if self.jump_count < 0:
             neg = -neg
-        self.bird.y -= self.jump_count ** 2 * neg * 0.5
+        self.flappy.change_pos(self.jump_count ** 2 * neg * 0.5)
         if self.jump_count > 0:
             self.jump_count -= 1
         else:
             self.jump_count -= 0.5
+
+
+class Bird:
+    def __init__(self, surface, bottom):
+        self.surface = surface
+        self.img = [pygame.image.load("./Assets/bird_1.png").convert_alpha(),
+                    pygame.image.load("./Assets/bird_2.png").convert_alpha(),
+                    pygame.image.load("./Assets/bird_3.png").convert_alpha()]
+        self.img_counter = 0
+        self.x = surface.get_width() * 0.4
+        self.y = surface.get_height() * 0.5 - bottom.get_rect().height
+        self.dance_x = 0
+        self.time = 1
+        self.time2 = 0
+        self.up = False
+        self.down = False
+
+    def draw(self):
+        self.surface.blit(self.img[self.img_counter], (self.x, self.y))
+        self.time += 1
+        if self.time > 5:
+            self.img_counter += 1
+            if self.img_counter > 2:
+                self.img_counter = 0
+            self.time = 1
+
+    def dance(self):
+        self.time2 += 1
+        if self.time2 > 5:
+            self.y += 30 * math.sin(self.dance_x)
+            self.time2 = 0
+        self.dance_x += 2
+
+    def height(self):
+        return self.img[0].get_rect().height
+
+    def change_pos(self, new_position):
+        self.y -= new_position
 
 
 main()
