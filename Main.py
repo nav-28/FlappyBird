@@ -1,6 +1,7 @@
 # Flappy Bird
 
 import pygame
+from bird import Bird
 import math
 
 
@@ -38,9 +39,13 @@ class Game:
         self.bottom = pygame.image.load("./Assets/Bottom_border.png").convert()
 
         # flappy variables
-        self.flappy = Bird(surface, self.bottom)
         self.max_jump = 10
         self.jump_count = 0
+
+        self.player = Bird(surface, self.bottom)
+        self.all_sprite = pygame.sprite.Group(self.player)
+
+        self.dt = None
 
         # Jumping variables
         self.isJump = False
@@ -52,15 +57,14 @@ class Game:
     def play(self):
         # main game loop
         while self.continue_game:
+            self.dt = self.clock.tick(self.fps) / 1000
             self.event_handler()
             if self.start_game:
                 self.jump()
-            else:
-                self.flappy.dance()
+
             self.draw()
             self.check_bottom_collision()
             pygame.display.update()
-            self.clock.tick(self.fps)
 
     def event_handler(self):
         # check for event in pygame
@@ -80,7 +84,8 @@ class Game:
     def draw(self):
         # draws the objects on the surface
         self.surface.blit(self.background, (0, -self.bottom.get_rect().height))
-        self.flappy.draw()
+        self.player.image_animation(self.dt)
+        self.all_sprite.draw(self.surface)
         if self.continue_game:
             self.background_scroll()
 
@@ -95,7 +100,7 @@ class Game:
 
     def check_bottom_collision(self):
         # checking for end game collision
-        if self.bottom_rect.collidepoint(self.flappy.x, self.flappy.y + self.flappy.height()):
+        if self.bottom_rect.collidepoint(self.player.rect.x, self.player.rect.y + self.player.rect.height):
             self.continue_game = False
             pygame.display.update()
 
@@ -107,49 +112,11 @@ class Game:
         neg = 1
         if self.jump_count < 0:
             neg = -neg
-        self.flappy.change_pos(self.jump_count ** 2 * neg * 0.5)
+        self.player.change_pos(self.jump_count ** 2 * neg * 0.5)
         if self.jump_count > 0:
             self.jump_count -= 1
         else:
             self.jump_count -= 0.5
-
-
-class Bird:
-    def __init__(self, surface, bottom):
-        self.surface = surface
-        self.img = [pygame.image.load("./Assets/bird_1.png").convert_alpha(),
-                    pygame.image.load("./Assets/bird_2.png").convert_alpha(),
-                    pygame.image.load("./Assets/bird_3.png").convert_alpha()]
-        self.img_counter = 0
-        self.x = surface.get_width() * 0.4
-        self.y = surface.get_height() * 0.5 - bottom.get_rect().height
-        self.dance_x = 0
-        self.time = 1
-        self.time2 = 0
-        self.up = False
-        self.down = False
-
-    def draw(self):
-        self.surface.blit(self.img[self.img_counter], (self.x, self.y))
-        self.time += 1
-        if self.time > 5:
-            self.img_counter += 1
-            if self.img_counter > 2:
-                self.img_counter = 0
-            self.time = 1
-
-    def dance(self):
-        self.time2 += 1
-        if self.time2 > 5:
-            self.y += 30 * math.sin(self.dance_x)
-            self.time2 = 0
-        self.dance_x += 2
-
-    def height(self):
-        return self.img[0].get_rect().height
-
-    def change_pos(self, new_position):
-        self.y -= new_position
 
 
 main()
