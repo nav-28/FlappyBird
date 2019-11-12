@@ -8,7 +8,7 @@ class Bird(pygame.sprite.Sprite):
     def __init__(self, surface, ground):
         """
         :param surface: surface of the window
-        :param bottom: ground rect
+        :param ground: ground rect
         """
         super().__init__()
         # loading images
