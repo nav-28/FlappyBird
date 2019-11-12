@@ -1,42 +1,96 @@
-# Flappy Bird
+# Bird Class of Flappy Bird
 
 import pygame
 import math
 
 
 class Bird(pygame.sprite.Sprite):
-    def __init__(self, surface, bottom):
+    def __init__(self, surface, ground):
+        """
+        :param surface: surface of the window
+        :param bottom: ground rect
+        """
         super().__init__()
-
+        # loading images
         self.surface = surface
         self.group_images = [pygame.image.load("./Assets/bird_1.png").convert_alpha(),
                              pygame.image.load("./Assets/bird_2.png").convert_alpha(),
                              pygame.image.load("./Assets/bird_3.png").convert_alpha()]
+        for i in range(3):
+            self.group_images[i] = pygame.transform.scale(self.group_images[i], (138, 96))
         self.image_index = 0
-        self.image = pygame.image.load("./Assets/bird_1.png")
+        self.image = self.group_images[0]
 
+        # bird position variables
         self.rect = self.image.get_rect()
+        self.rect.x = surface.get_width() * 0.4
+        self.rect.y = surface.get_height() * 0.5 - ground.get_rect().height
 
-        self.rect.x = surface.get_width() // 2
-        self.rect.y = surface.get_height() // 2 - bottom.get_rect().height
+        # flapping animation variables
+        self.flapping_animation_time = 0.1
+        self.flapping_current_time = 0
+        self.bounce_x = 0
 
-        self.animation_time = 0.1
-        self.current_time = 0
-        self.x = 0
-        self.time = 1
+        # rotation animation variables
+        self.rotation_animation_time = 0.1
+        self.rotation_current_time = 0
+        self.rotation_angle = 0
 
-    def image_animation(self, dt):
-        self.current_time += dt
-        if self.current_time >= self.animation_time:
-            self.current_time = 0
-            self.image_index = (self.image_index + 1) % len(self.group_images)
-            self.image = self.group_images[self.image_index]
+        # game variables
+        self.isUp = False
+        self.isDown = False
+        self.isJump = False
 
-            self.rect.y += 20 * math.sin(self.x)
-            self.x += 1
+        # moving variables
+        self.max_jump = 10
+        self.jump_count = 0
 
-    def height(self):
-        return self.rect.height
+    def image_animation(self, dt, game_start):
+        """
+            Animation for the bird sprite
+        :param dt: int, for frame animation
+        :param game_start: Bool
+        :return: None
+        """
+        if game_start:
+            self.flapping_current_time += dt
+            if self.flapping_current_time >= self.flapping_animation_time:
+                self.flapping_current_time = 0
+                self.image_index = (self.image_index + 1) % len(self.group_images)
+                self.image = self.group_images[self.image_index]
 
-    def change_pos(self, new_position):
-        self.rect.y -= new_position
+        if not game_start:
+            self.flapping_current_time += dt
+            if self.flapping_current_time >= self.flapping_animation_time:
+                self.flapping_current_time = 0
+                self.rect.y += 20 * math.sin(self.bounce_x)
+                self.bounce_x += 0.5
+                if self.bounce_x > 2*math.pi:
+                    self.bounce_x = 0
+
+    def move(self):
+        """
+            Moves the Bird based on player input
+        :return: None
+        """
+        if self.isJump:
+            self.jump_count = self.max_jump
+            self.isJump = False
+
+        neg = 1     # for changing direction of the parabola
+        if self.jump_count < 0:
+            neg = -1
+
+        self.rect.y -= self.jump_count**2 * neg * 0.5
+
+        if self.jump_count < 0:
+            self.jump_count -= 0.5      # slows down the Bird Falling
+        else:
+            self.jump_count -= 1
+
+    def jump(self):
+        """
+            changes the isJump when player jumps
+        :return: None
+        """
+        self.isJump = True
