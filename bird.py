@@ -13,9 +13,9 @@ class Bird(pygame.sprite.Sprite):
         super().__init__()
         # loading images
         self.surface = surface
-        self.group_images = [pygame.image.load("./Assets/bird_1.png").convert_alpha(),
-                             pygame.image.load("./Assets/bird_2.png").convert_alpha(),
-                             pygame.image.load("./Assets/bird_3.png").convert_alpha()]
+        self.group_images = [pygame.image.load("./Assets/images/bird_1.png").convert_alpha(),
+                             pygame.image.load("./Assets/images/bird_2.png").convert_alpha(),
+                             pygame.image.load("./Assets/images/bird_3.png").convert_alpha()]
         for i in range(3):
             self.group_images[i] = pygame.transform.scale(self.group_images[i], (138, 96))
         self.image_index = 0
@@ -94,3 +94,6 @@ class Bird(pygame.sprite.Sprite):
         :return: None
         """
         self.isJump = True
+
+    def return_pos(self):
+        return self.rect.x
