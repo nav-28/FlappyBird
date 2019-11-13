@@ -19,7 +19,7 @@ class Font:
         # font objects
         self.game_font = pygame.font.Font("./Assets/font/FB.ttf", 100)
         self.score_font = pygame.font.Font("./Assets/font/FB.ttf", 130)
-        self.intro_font = pygame.font.Font("./Assets/font/katyfont.ttf", 50)
+        self.intro_font = pygame.font.Font("./Assets/font/PixelFJVerdana12pt.ttf", 20)
         # restart image
         restart = pygame.image.load("./Assets/images/restart.png").convert_alpha()
         self.restart = pygame.transform.scale(restart, (int(214 * 1.5), int(75 * 1.5)))
@@ -33,7 +33,7 @@ class Font:
         self.main_text2 = self.game_font.render("Flappy Bird", True, pygame.Color("black"))     # black shadow
 
         # intro text surface
-        self.intro_text = self.intro_font.render("Press SPACE to start the game", True, pygame.Color(83, 55, 70))
+        self.intro_text = self.intro_font.render("press SPACE to start the game", True, pygame.Color(83, 55, 70))
 
         # game over surface
         self.game_over_text = self.game_font.render("Game Over", True, pygame.Color("white"))
@@ -52,7 +52,7 @@ class Font:
         y = self.surface.get_height() // 2 - self.bottom.get_rect().height - 400
         self.surface.blit(self.main_text2, (x + 10, y + 10))
         self.surface.blit(self.main_text, (x, y))
-        self.surface.blit(self.intro_text, (x - 140, y + 160))
+        self.surface.blit(self.intro_text, (x, y + 130))
 
     def draw_game_over(self, score):
         """

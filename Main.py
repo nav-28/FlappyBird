@@ -8,8 +8,7 @@ from text import Font
 
 def main():
     pygame.init()
-    window_size = (1080, 1920)  # Full HD Resolution
-
+    window_size = (1080, 1920)
     pygame.display.set_mode(window_size)
     pygame.display.set_caption("Flappy Bird")
     window_surface = pygame.display.get_surface()
@@ -104,7 +103,7 @@ class Game:
         events = pygame.event.get()
         keys = pygame.key.get_pressed()
         for event in events:
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:
                 self.continue_game = False
             if event.type == pygame.KEYDOWN:
                 if keys[pygame.K_SPACE]:
@@ -146,8 +145,8 @@ class Game:
         if self.game_pause:     # draws the last frame when game pauses
             self.pipe1.draw(self.pipe1_rel_x)
             self.pipe2.draw(self.pipe2_rel_x)
-            self.surface.blit(self.ground, (self.rel_x - self.ground.get_rect().width, self.surface.get_height() - self.ground.get_rect().height))
-            self.surface.blit(self.ground, (self.rel_x, self.surface.get_height() - self.ground.get_rect().height))
+            self.surface.blit(self.ground, (self.rel_x - self.ground.get_rect().width, self.ground_y))
+            self.surface.blit(self.ground, (self.rel_x, self.ground_y))
 
     def background_scroll(self):
         """
@@ -188,7 +187,6 @@ class Game:
             self.collision = True
         elif self.pipe2.collision(self.player.rect):
             self.collision = True
-            print(self.collision)
 
     def update_score(self):
         if self.player.return_pos() > self.pipe1_rel_x + self.pipe1.pipe_width() and self.cross_pipe1 is False:
