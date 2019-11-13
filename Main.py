@@ -12,9 +12,7 @@ def main():
 
     pygame.display.set_mode(window_size)
     pygame.display.set_caption("Flappy Bird")
-
     window_surface = pygame.display.get_surface()
-
     game = Game(window_surface)
     game.play()
     pygame.quit()
@@ -47,6 +45,7 @@ class Game:
         self.ground = pygame.image.load("./Assets/images/ground.png").convert_alpha()
         self.bg_scroll = 0
         self.rel_x = self.bg_scroll % self.ground.get_rect().width  # for background scrolling
+        self.ground_y = self.surface.get_height() - self.ground.get_rect().height
 
         # flappy objects
         self.player = Bird(self.surface, self.background)
@@ -62,13 +61,13 @@ class Game:
         self.pipe2 = Pipe(self.surface, self.ground)
 
         # pipe scroll variables
-        self.pipe1_rel_x = self.surface.get_width() + 1000
+        self.pipe1_rel_x = self.surface.get_width() + 1000      # added 1000 to give some time when game starts
         self.min_pipe1_rel_x = -self.pipe1.pipe_width()
 
-        self.pipe2_rel_x = self.surface.get_width() + 1700
+        self.pipe2_rel_x = self.surface.get_width() + 1700      # added 700 due to pipe difference
         self.min_pipe2_rel_x = -self.pipe2.pipe_width()
 
-        # game intro and outro texts
+        # game texts object
         self.game_text = Font(self.surface, self.ground)
 
     def play(self):
@@ -78,11 +77,10 @@ class Game:
         """
         while self.continue_game:
             self.dt = self.clock.tick(self.fps) / 1000  # for game animation
-
             self.event_handler()  # handling pygame events
 
             if self.start_game:
-                self.game_start()  # game start function
+                self.play_game()  # game start function
 
             if not self.game_pause:
                 self.player.image_animation(self.dt, self.start_game)  # bird animation
@@ -114,13 +112,13 @@ class Game:
                     self.player.jump()
                 if keys[pygame.K_SPACE]:
                     if self.game_pause:
-                        self.__init__(self.surface)
+                        self.__init__(self.surface)     # restarts the game
                         self.dt = self.clock.tick(self.fps) / 1000
         if self.collision:
             self.game_pause = True
             self.start_game = False
 
-    def game_start(self):
+    def play_game(self):
         """
             Starts the game when space is pressed
         :return: None
@@ -128,7 +126,7 @@ class Game:
         self.pipe_scroll()
         self.player.move()
         self.update_score()
-        self.check_bottom_collision()
+        self.bottom_collision()
         self.pipe_collision()
 
     def draw(self):
@@ -145,7 +143,7 @@ class Game:
         if not self.game_pause:
             self.background_scroll()
 
-        if self.game_pause:
+        if self.game_pause:     # draws the last frame when game pauses
             self.pipe1.draw(self.pipe1_rel_x)
             self.pipe2.draw(self.pipe2_rel_x)
             self.surface.blit(self.ground, (self.rel_x - self.ground.get_rect().width, self.surface.get_height() - self.ground.get_rect().height))
@@ -158,9 +156,9 @@ class Game:
         """
         if self.continue_game:  # stars scrolling when game starts
             self.rel_x = self.bg_scroll % self.ground.get_rect().width
-        self.surface.blit(self.ground, (self.rel_x - self.ground.get_rect().width, self.surface.get_height() - self.ground.get_rect().height))
+        self.surface.blit(self.ground, (self.rel_x - self.ground.get_rect().width, self.ground_y))
         if self.rel_x < self.surface.get_width():
-            self.surface.blit(self.ground, (self.rel_x, self.surface.get_height() - self.ground.get_rect().height))
+            self.surface.blit(self.ground, (self.rel_x, self.ground_y))
         if self.continue_game:
             self.bg_scroll -= 10
 
@@ -200,7 +198,7 @@ class Game:
             self.score += 1
             self.cross_pipe2 = True
 
-    def check_bottom_collision(self):
+    def bottom_collision(self):
         """
             Check for collision of player sprite with the ground
         :return: None

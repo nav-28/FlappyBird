@@ -7,23 +7,28 @@ from random import randint
 class Pipe:
     def __init__(self, surface, ground):
         """
-
+            Creates 2 pipes
         :param surface: Surface to draw the pipe on
         :param ground: Ground for calculating the pipe's position
         """
         self.surface = surface
+
+        # pipe images
         self.low_pipe = pygame.image.load("./Assets/images/pipe.png").convert_alpha()
         self.up_pipe = pygame.transform.flip(self.low_pipe, 0, 1)
 
+        # pipe rects
         self.low_rect = self.low_pipe.get_rect()
         self.up_rect = self.up_pipe.get_rect()
-        self.low_rect.y = randint(596, 1476)
+
+        # pipe location
         self.pip_difference = 500
+        self.low_rect.y = randint(596, 1476)
         self.up_rect.bottomleft = (0, self.low_rect.y - self.pip_difference)
 
     def pip_position(self):
         """
-            Change the pipe height every time it respawn
+            Change the pipe height every time it respawns
         :return: None
         """
         self.low_rect.y = randint(596, 1476)
@@ -34,9 +39,11 @@ class Pipe:
             blits the pipe on the surface
         :return: None
         """
+        # (x) co-ordinate of the pipes
         self.low_rect.x = rel_x
         self.up_rect.x = rel_x
 
+        # draws pipe over surface
         self.surface.blit(self.low_pipe, (self.low_rect.x, self.low_rect.y))
         self.surface.blit(self.up_pipe, (self.up_rect.x, self.up_rect.y))
 
@@ -46,9 +53,7 @@ class Pipe:
         :param rect:
         :return: bool
         """
-        if self.low_rect.colliderect(rect):
-            return True
-        elif self.up_rect.colliderect(rect):
+        if self.low_rect.colliderect(rect) or self.up_rect.colliderect(rect):
             return True
         else:
             return False

@@ -8,33 +8,29 @@ class Bird(pygame.sprite.Sprite):
     def __init__(self, surface, background):
         """
         :param surface: surface of the window
-        :param ground: ground rect
+        :param background: background rect
         """
-        super().__init__()
+        super().__init__()      # sprite initialisation
         # loading images
         self.surface = surface
         self.group_images = [pygame.image.load("./Assets/images/bird_1.png").convert_alpha(),
                              pygame.image.load("./Assets/images/bird_2.png").convert_alpha(),
                              pygame.image.load("./Assets/images/bird_3.png").convert_alpha()]
         for i in range(3):
-            self.group_images[i] = pygame.transform.scale(self.group_images[i], (138, 96))
+            self.group_images[i] = pygame.transform.scale(self.group_images[i], (138, 96))   # scaling image for Display
         self.image_index = 0
-        self.image = self.group_images[0]
+        self.image = self.group_images[0]   # used by sprite to blit to surface
 
         # bird position variables
         self.rect = self.image.get_rect()
         self.rect.x = surface.get_width() * 0.4 - self.rect.width//2
         self.rect.y = background.get_rect().height * 0.35
+        self.temp_y = self.rect.y       # for repeating pattern
 
         # flapping animation variables
         self.flapping_animation_time = 0.1
         self.flapping_current_time = 0
         self.bounce_x = 0
-
-        # rotation animation variables
-        self.rotation_animation_time = 0.1
-        self.rotation_current_time = 0
-        self.rotation_angle = 0
 
         # game variables
         self.isUp = False
@@ -54,19 +50,20 @@ class Bird(pygame.sprite.Sprite):
         """
         if game_start:
             self.flapping_current_time += dt
-            if self.flapping_current_time >= self.flapping_animation_time:
+            if self.flapping_current_time >= self.flapping_animation_time:      # changes every 5 frames
                 self.flapping_current_time = 0
                 self.image_index = (self.image_index + 1) % len(self.group_images)
                 self.image = self.group_images[self.image_index]
 
         if not game_start:
             self.flapping_current_time += dt
-            if self.flapping_current_time >= self.flapping_animation_time:
+            if self.flapping_current_time >= self.flapping_animation_time:      # changes every 5 frames
                 self.flapping_current_time = 0
-                self.rect.y += 20 * math.sin(self.bounce_x)
+                self.rect.y += 20 * math.sin(self.bounce_x)         # moves the bird in a repeated pattern
                 self.bounce_x += 0.5
-                if self.bounce_x > 2*math.pi:
+                if self.bounce_x > 2 * math.pi:
                     self.bounce_x = 0
+                    self.rect.y = self.temp_y       # places the bird back to original position
 
     def move(self):
         """
@@ -81,10 +78,10 @@ class Bird(pygame.sprite.Sprite):
         if self.jump_count < 0:
             neg = -1
 
-        self.rect.y -= self.jump_count**2 * neg * 0.5
+        self.rect.y -= self.jump_count**2 * neg * 0.5   # move the bird in a parabola
 
         if self.jump_count < 0:
-            self.jump_count -= 0.5      # slows down the Bird Falling
+            self.jump_count -= 0.5      # slows down when the bird is falling
         else:
             self.jump_count -= 1
 

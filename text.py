@@ -33,14 +33,14 @@ class Font:
         self.main_text2 = self.game_font.render("Flappy Bird", True, pygame.Color("black"))     # black shadow
 
         # intro text surface
-        self.intro_text = self.intro_font.render("Press SPACE to start the game", False, pygame.Color(83, 55, 70))
+        self.intro_text = self.intro_font.render("Press SPACE to start the game", True, pygame.Color(83, 55, 70))
 
         # game over surface
         self.game_over_text = self.game_font.render("Game Over", True, pygame.Color("white"))
         self.game_over_text2 = self.game_font.render("Game Over", True, pygame.Color("black"))  # black shadow
 
         # center y co-ordinate of the surface
-        self.middle_position = self.surface.get_height() // 2 - self.bottom.get_rect().height
+        self.middle_position = self.surface.get_height() // 2 - self.bottom.get_rect().height - 300
 
     def draw_intro(self):
         """
@@ -49,7 +49,7 @@ class Font:
         """
         # intro text
         x = self.surface.get_width() // 2 - self.main_text.get_width() // 2
-        y = self.middle_position - 400
+        y = self.surface.get_height() // 2 - self.bottom.get_rect().height - 400
         self.surface.blit(self.main_text2, (x + 10, y + 10))
         self.surface.blit(self.main_text, (x, y))
         self.surface.blit(self.intro_text, (x - 140, y + 160))
