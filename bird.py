@@ -5,7 +5,7 @@ import math
 
 
 class Bird(pygame.sprite.Sprite):
-    def __init__(self, surface, ground):
+    def __init__(self, surface, background):
         """
         :param surface: surface of the window
         :param ground: ground rect
@@ -23,8 +23,8 @@ class Bird(pygame.sprite.Sprite):
 
         # bird position variables
         self.rect = self.image.get_rect()
-        self.rect.x = surface.get_width() * 0.4
-        self.rect.y = surface.get_height() * 0.5 - ground.get_rect().height
+        self.rect.x = surface.get_width() * 0.4 - self.rect.width//2
+        self.rect.y = background.get_rect().height * 0.35
 
         # flapping animation variables
         self.flapping_animation_time = 0.1

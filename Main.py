@@ -49,7 +49,7 @@ class Game:
         self.rel_x = self.bg_scroll % self.ground.get_rect().width  # for background scrolling
 
         # flappy objects
-        self.player = Bird(self.surface, self.ground)
+        self.player = Bird(self.surface, self.background)
         self.all_sprites = pygame.sprite.Group(self.player)
         self.dt = None  # timer for bird animation
 
@@ -207,8 +207,6 @@ class Game:
         """
         if self.bottom_rect.collidepoint(self.player.rect.x, self.player.rect.y + self.player.rect.height):
             self.collision = True
-            print(self.collision)
-            pygame.display.update()
 
 
 if __name__ == "__main__":
