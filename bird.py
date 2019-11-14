@@ -27,15 +27,27 @@ class Bird(pygame.sprite.Sprite):
         self.rect.y = background.get_rect().height * 0.35
         self.temp_y = self.rect.y       # for repeating pattern
 
+        # rotated images
+        self.rotated_group_images = []
+        for i in range(3):
+            self.rotated_group_images.append(pygame.transform.rotate(self.group_images[i], 40))
         # flapping animation variables
         self.flapping_animation_time = 0.1
         self.flapping_current_time = 0
         self.bounce_x = 0
 
+        # rotation variables
+        self.max_rotation = -130
+        self.rotate = -10
+        self.rotated = 0
+        self.rotation_animation_time = 0.05
+        self.rotation_time = 0
+
         # game variables
         self.isUp = False
         self.isDown = False
         self.isJump = False
+        self.jump_height = 0
 
         # moving variables
         self.max_jump = 10
@@ -81,16 +93,51 @@ class Bird(pygame.sprite.Sprite):
         self.rect.y -= self.jump_count**2 * neg * 0.5   # move the bird in a parabola
 
         if self.jump_count < 0:
-            self.jump_count -= 0.5      # slows down when the bird is falling
+            self.jump_count -= 0.3      # slows down when the bird is falling
         else:
             self.jump_count -= 1
 
-    def jump(self):
+    def rotation(self, dt):
+        """
+            Rotates the bird as per its position
+        :param dt: for counting frames
+        :return: None
+        """
+        if self.isJump and not self.isUp:
+            old_center = self.rect.center
+            for i in range(3):
+                self.group_images[i] = self.rotated_group_images[i]
+            self.image = self.group_images[self.image_index]
+            self.rect = self.image.get_rect()
+            self.rect.center = old_center
+            self.isUp, self.isDown = True, False
+
+        if self.isUp and self.isJump:
+            self.jump_height = self.rect.y
+
+        if not self.isJump and not self.isDown:
+            if self.rect.y > self.jump_height:
+                if self.rotated >= self.max_rotation:
+                    self.rotation_time += dt
+                    if self.rotation_time >= self.rotation_animation_time:
+                        self.isUp = False
+                        old_center = self.rect.center
+                        for i in range(3):
+                            self.group_images[i] = pygame.transform.rotate(self.group_images[i], self.rotate)
+                        self.image = self.group_images[self.image_index]
+                        self.rect = self.image.get_rect()
+                        self.rect.center = old_center
+                        self.rotated += self.rotate
+                        if self.rotated == self.max_rotation:
+                            self.isDown = True
+                            self.rotated = 0
+
+    def jump(self, val):
         """
             changes the isJump when player jumps
         :return: None
         """
-        self.isJump = True
+        self.isJump = val
 
     def return_pos(self):
         return self.rect.x

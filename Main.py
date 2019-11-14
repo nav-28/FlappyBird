@@ -37,7 +37,7 @@ class Game:
         self.cross_pipe2 = False
 
         # fps counter
-        self.fps = 50
+        self.fps = 30
 
         # background and ground
         self.background = pygame.image.load("./Assets/images/flappy_background.png").convert_alpha()
@@ -108,7 +108,9 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if keys[pygame.K_SPACE]:
                     self.start_game = True
-                    self.player.jump()
+                    self.player.jump(True)
+                if not keys[pygame.K_SPACE]:
+                    self.player.jump(False)
                 if keys[pygame.K_SPACE]:
                     if self.game_pause:
                         self.__init__(self.surface)     # restarts the game
@@ -123,10 +125,10 @@ class Game:
         :return: None
         """
         self.pipe_scroll()
+        self.player.rotation(self.dt)
         self.player.move()
         self.update_score()
-        self.bottom_collision()
-        self.pipe_collision()
+        self.player_collision()
 
     def draw(self):
         """
@@ -135,6 +137,7 @@ class Game:
         """
         self.surface.blit(self.background, (0, -self.ground.get_rect().height))
         self.all_sprites.draw(self.surface)
+        pygame.draw.rect(self.surface, pygame.Color('black'), self.player.rect, 2)
         if self.start_game:
             self.pipe1.draw(self.pipe1_rel_x)
             self.pipe2.draw(self.pipe2_rel_x)
@@ -178,7 +181,7 @@ class Game:
             self.pipe2.pip_position()
         self.pipe2_rel_x -= 10
 
-    def pipe_collision(self):
+    def player_collision(self):
         """
             Checks for collision with the player and the bird
         :return: None
@@ -187,6 +190,9 @@ class Game:
             self.collision = True
         elif self.pipe2.collision(self.player.rect):
             self.collision = True
+        elif self.bottom_rect.collidepoint(self.player.rect.x, self.player.rect.y + self.player.rect.height):
+            self.collision = True
+
 
     def update_score(self):
         if self.player.return_pos() > self.pipe1_rel_x + self.pipe1.pipe_width() and self.cross_pipe1 is False:
@@ -195,14 +201,6 @@ class Game:
         if self.player.return_pos() > self.pipe2_rel_x + self.pipe2.pipe_width() and self.cross_pipe2 is False:
             self.score += 1
             self.cross_pipe2 = True
-
-    def bottom_collision(self):
-        """
-            Check for collision of player sprite with the ground
-        :return: None
-        """
-        if self.bottom_rect.collidepoint(self.player.rect.x, self.player.rect.y + self.player.rect.height):
-            self.collision = True
 
 
 if __name__ == "__main__":
