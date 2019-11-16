@@ -1,5 +1,5 @@
 # Flappy Bird
-A recreating of Flappy Bird with pygame
+A recreation of Flappy Bird with pygame
 
 # Instructions
 Use need the pygame module to run the game.
