@@ -1,5 +1,5 @@
 # Flappy Bird
-A recreating of Flappy Bird with pygame
+A recreation of Flappy Bird with pygame
 
 # Instructions
 Use need the pygame module to run the game.
@@ -11,4 +11,5 @@ install pygame using pip by the following command in the terminal:
 `pip install pygame` 
 
 Simply run *Main.py* and and start playing the game.
+
 
