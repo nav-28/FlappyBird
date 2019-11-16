@@ -31,6 +31,7 @@ class Bird(pygame.sprite.Sprite):
         self.rotated_group_images = []
         for i in range(3):
             self.rotated_group_images.append(pygame.transform.rotate(self.group_images[i], 40))
+
         # flapping animation variables
         self.flapping_animation_time = 0.1
         self.flapping_current_time = 0
@@ -43,6 +44,10 @@ class Bird(pygame.sprite.Sprite):
         self.rotation_animation_time = 0.05
         self.rotation_time = 0
 
+        # rect for detecting collision
+        self.collision_rect = self.rect
+        self.collision_rect.y += 40     # to match bird's new position
+        self.collision_rect.height += 40
         # game variables
         self.isUp = False
         self.isDown = False
@@ -91,7 +96,7 @@ class Bird(pygame.sprite.Sprite):
             neg = -1
 
         self.rect.y -= self.jump_count**2 * neg * 0.5   # move the bird in a parabola
-
+        self.collision_rect.y -= self.jump_count**2 * neg * 0.5
         if self.jump_count < 0:
             self.jump_count -= 0.3      # slows down when the bird is falling
         else:
@@ -122,6 +127,7 @@ class Bird(pygame.sprite.Sprite):
                     if self.rotation_time >= self.rotation_animation_time:
                         self.isUp = False
                         old_center = self.rect.center
+                        old_rect = self.rect
                         for i in range(3):
                             self.group_images[i] = pygame.transform.rotate(self.group_images[i], self.rotate)
                         self.image = self.group_images[self.image_index]

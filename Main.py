@@ -136,15 +136,13 @@ class Game:
         :return: None
         """
         self.surface.blit(self.background, (0, -self.ground.get_rect().height))
-        self.all_sprites.draw(self.surface)
-        pygame.draw.rect(self.surface, pygame.Color('black'), self.player.rect, 2)
         if self.start_game:
             self.pipe1.draw(self.pipe1_rel_x)
             self.pipe2.draw(self.pipe2_rel_x)
             self.game_text.draw_score(str(self.score))
+        self.all_sprites.draw(self.surface)
         if not self.game_pause:
             self.background_scroll()
-
         if self.game_pause:     # draws the last frame when game pauses
             self.pipe1.draw(self.pipe1_rel_x)
             self.pipe2.draw(self.pipe2_rel_x)
@@ -186,13 +184,12 @@ class Game:
             Checks for collision with the player and the bird
         :return: None
         """
-        if self.pipe1.collision(self.player.rect):
+        if self.pipe1.collision(self.player.collision_rect):
             self.collision = True
-        elif self.pipe2.collision(self.player.rect):
+        elif self.pipe2.collision(self.player.collision_rect):
             self.collision = True
-        elif self.bottom_rect.collidepoint(self.player.rect.x, self.player.rect.y + self.player.rect.height):
+        elif self.bottom_rect.colliderect(self.player.collision_rect):
             self.collision = True
-
 
     def update_score(self):
         if self.player.return_pos() > self.pipe1_rel_x + self.pipe1.pipe_width() and self.cross_pipe1 is False:
