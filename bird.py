@@ -17,7 +17,7 @@ class Bird(pygame.sprite.Sprite):
                              pygame.image.load("./Assets/images/bird_2.png").convert_alpha(),
                              pygame.image.load("./Assets/images/bird_3.png").convert_alpha()]
         for i in range(3):
-            self.group_images[i] = pygame.transform.scale(self.group_images[i], (138, 96))   # scaling image for Display
+            self.group_images[i] = pygame.transform.scale(self.group_images[i], (int(surface.get_width()//7.8), int(surface.get_height()//20)))   # scaling image for Display
         self.image_index = 0
         self.image = self.group_images[0]   # used by sprite to blit to surface
 
@@ -46,8 +46,9 @@ class Bird(pygame.sprite.Sprite):
 
         # rect for detecting collision
         self.collision_rect = self.rect
-        self.collision_rect.y += 40     # to match bird's new position
-        self.collision_rect.height += 40
+        self.collision_rect.y += surface.get_height() // 64    # to match bird's new position
+        self.collision_rect.height += surface.get_height() // 64
+
         # game variables
         self.isUp = False
         self.isDown = False
@@ -57,6 +58,12 @@ class Bird(pygame.sprite.Sprite):
         # moving variables
         self.max_jump = 10
         self.jump_count = 0
+
+        # for different resolutions
+        if self.surface.get_height() < 1920:
+            self.jump_range = 0.3
+        else:
+            self.jump_range = 0.5
 
     def image_animation(self, dt, game_start):
         """
@@ -95,10 +102,10 @@ class Bird(pygame.sprite.Sprite):
         if self.jump_count < 0:
             neg = -1
 
-        self.rect.y -= self.jump_count**2 * neg * 0.5   # move the bird in a parabola
-        self.collision_rect.y -= self.jump_count**2 * neg * 0.5
+        self.rect.y -= self.jump_count**2 * neg * self.jump_range   # move the bird in a parabola
+        self.collision_rect.y -= self.jump_count**2 * neg * self.jump_range
         if self.jump_count < 0:
-            self.jump_count -= 0.3      # slows down when the bird is falling
+            self.jump_count -= 0.5      # slows down when the bird is falling
         else:
             self.jump_count -= 1
 
@@ -127,7 +134,6 @@ class Bird(pygame.sprite.Sprite):
                     if self.rotation_time >= self.rotation_animation_time:
                         self.isUp = False
                         old_center = self.rect.center
-                        old_rect = self.rect
                         for i in range(3):
                             self.group_images[i] = pygame.transform.rotate(self.group_images[i], self.rotate)
                         self.image = self.group_images[self.image_index]

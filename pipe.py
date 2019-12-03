@@ -15,6 +15,7 @@ class Pipe:
 
         # pipe images
         self.low_pipe = pygame.image.load("./Assets/images/pipe.png").convert_alpha()
+        self.low_pipe = pygame.transform.scale(self.low_pipe, (int(surface.get_width()//5.32), int(surface.get_height()//1.64)))
         self.up_pipe = pygame.transform.flip(self.low_pipe, 0, 1)
 
         # pipe rects
@@ -22,8 +23,8 @@ class Pipe:
         self.up_rect = self.up_pipe.get_rect()
 
         # pipe location
-        self.pip_difference = 500
-        self.low_rect.y = randint(596, 1476)
+        self.pip_difference = surface.get_height() // 3.84
+        self.low_rect.y = randint(surface.get_height() // 1.81, surface.get_height()//1.3)
         self.up_rect.bottomleft = (0, self.low_rect.y - self.pip_difference)
 
     def pip_position(self):
@@ -31,7 +32,7 @@ class Pipe:
             Change the pipe height every time it respawns
         :return: None
         """
-        self.low_rect.y = randint(596, 1476)
+        self.low_rect.y = randint(self.surface.get_height() // 1.81, self.surface.get_height()//1.3)
         self.up_rect.bottomleft = (0, self.low_rect.y - self.pip_difference)
 
     def draw(self, rel_x):

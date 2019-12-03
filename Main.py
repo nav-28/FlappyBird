@@ -8,7 +8,7 @@ from text import Font
 
 def main():
     pygame.init()
-    window_size = (1080, 1920)
+    window_size = (480, 820)
     pygame.display.set_mode(window_size)
     pygame.display.set_caption("Flappy Bird")
     window_surface = pygame.display.get_surface()
@@ -41,7 +41,9 @@ class Game:
 
         # background and ground
         self.background = pygame.image.load("./Assets/images/flappy_background.png").convert_alpha()
+        self.background = pygame.transform.scale(self.background, (surface.get_width(), surface.get_height()))
         self.ground = pygame.image.load("./Assets/images/ground.png").convert_alpha()
+        self.ground = pygame.transform.scale(self.ground, (surface.get_width(), int(surface.get_height()//5.48)))
         self.bg_scroll = 0
         self.rel_x = self.bg_scroll % self.ground.get_rect().width  # for background scrolling
         self.ground_y = self.surface.get_height() - self.ground.get_rect().height
@@ -60,10 +62,10 @@ class Game:
         self.pipe2 = Pipe(self.surface, self.ground)
 
         # pipe scroll variables
-        self.pipe1_rel_x = self.surface.get_width() + 1000      # added 1000 to give some time when game starts
+        self.pipe1_rel_x = self.surface.get_width() + self.surface.get_width() // 1.08     # added 1000 to give some time when game starts
         self.min_pipe1_rel_x = -self.pipe1.pipe_width()
 
-        self.pipe2_rel_x = self.surface.get_width() + 1700      # added 700 due to pipe difference
+        self.pipe2_rel_x = self.surface.get_width() + self.surface.get_width() // 1.54 + self.surface.get_width() // 1.08      # added 700 due to pipe difference
         self.min_pipe2_rel_x = -self.pipe2.pipe_width()
 
         # game texts object
@@ -115,6 +117,8 @@ class Game:
                     if self.game_pause:
                         self.__init__(self.surface)     # restarts the game
                         self.dt = self.clock.tick(self.fps) / 1000
+                if keys[pygame.K_ESCAPE]:
+                    self.continue_game = False
         if self.collision:
             self.game_pause = True
             self.start_game = False
@@ -141,6 +145,7 @@ class Game:
             self.pipe2.draw(self.pipe2_rel_x)
             self.game_text.draw_score(str(self.score))
         self.all_sprites.draw(self.surface)
+        pygame.draw.rect(self.surface, pygame.Color("black"), self.player.collision_rect, 1)
         if not self.game_pause:
             self.background_scroll()
         if self.game_pause:     # draws the last frame when game pauses
@@ -168,13 +173,13 @@ class Game:
         :return: None
         """
         if self.pipe1_rel_x < self.min_pipe1_rel_x:  # changes the pipe position when it goes out of window
-            self.pipe1_rel_x = self.pipe2_rel_x + 700  # maintains the distance between the pipes
+            self.pipe1_rel_x = self.pipe2_rel_x + self.surface.get_width() // 1.54  # maintains the distance between the pipes
             self.cross_pipe1 = False
             self.pipe1.pip_position()
         self.pipe1_rel_x -= 10
 
         if self.pipe2_rel_x < self.min_pipe2_rel_x:
-            self.pipe2_rel_x = self.pipe1_rel_x + 700
+            self.pipe2_rel_x = self.pipe1_rel_x + self.surface.get_width() // 1.54
             self.cross_pipe2 = False
             self.pipe2.pip_position()
         self.pipe2_rel_x -= 10
