@@ -145,7 +145,6 @@ class Game:
             self.pipe2.draw(self.pipe2_rel_x)
             self.game_text.draw_score(str(self.score))
         self.all_sprites.draw(self.surface)
-        pygame.draw.rect(self.surface, pygame.Color("black"), self.player.collision_rect, 1)
         if not self.game_pause:
             self.background_scroll()
         if self.game_pause:     # draws the last frame when game pauses
